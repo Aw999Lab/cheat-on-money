@@ -9,42 +9,64 @@
 
 > 哲学同 cheat-on-content：可信度靠**机制**，不靠内容质量。
 
+## 🚀 核心设计：AI 自主决策，不等用户
+
+**区别于其他工具的关键差异**：这套 skill 不会给你列一堆选项然后问你"你想选哪个"。它自己决策、自己执行、自己路由到下一步。
+
+```
+用户说"我想搞钱"
+  → money-init  自动建画像 → 自动路由
+  → money-find  自动搜机会 → 自动选最优 → 自动路由
+  → money-plan  自动出方案 → 自动执行第一步
+  → money-retro 自动复盘 → 自动决定继续/换方向
+```
+
+用户只需要说一次"我想搞钱"，后续全部自动推进。不满意可以说"换一个"，但不需要在每一步做选择题。
+
 ## 子 skill
 
-| 命令 | 作用 |
-|---|---|
-| `money-init` | 首次：建画像（技能/时间/资金/地区/露脸）+ 状态文件 |
-| `money-find` | 按画像实时检索机会 + 反诈筛选 |
-| `money-verify` | **核心**：验证某个具体机会是不是骗局 |
-| `money-plan` | 选定机会 → 行动方案 + 小成本验证第一步 |
-| `money-retro` | 复盘实际投入/收入 vs 预期，沉淀经验 |
-| `money-status` | 状态看板，任何时候可调 |
+| 命令 | 作用 | 自主程度 |
+|------|------|---------|
+| `money-init` | 建画像 + 自动路由 money-find | 🤖 自动推断 + 一次性收集 |
+| `money-find` | 搜机会 + **自动选最优** + 自动路由 money-plan | 🤖 全自动决策 |
+| `money-verify` | 验证机会 + **自动判定** + 可行则路由 money-plan | 🤖 全自动决策 |
+| `money-plan` | 出方案 + **自动执行第一步** | 🤖 能代劳就代劳 |
+| `money-retro` | 复盘 + **自动判定继续/止损** | 🤖 全自动决策 |
+| `money-status` | 看板 + **自动路由下一步** | 🤖 全自动决策 |
+
+## 自主决策评分规则（money-find 用）
+
+当搜出多个机会时，AI 按以下权重自动选择最优：
+
+| 维度 | 权重 | 评分标准 |
+|------|------|---------|
+| 匹配段位 | 30% | 与用户 tier 完全匹配 10 分，跨 1 档 5 分 |
+| 验证速度 | 25% | 验证第一步 ≤ 1 天 10 分，≤ 1 周 7 分 |
+| 启动成本 | 20% | 0 成本 10 分，< ¥500 7 分 |
+| 收入天花板 | 15% | 月入 > ¥1 万 10 分，> ¥3000 7 分 |
+| 时效信号强度 | 10% | 多源交叉验证 10 分，单一来源 5 分 |
 
 ## 共享文档（机制所在）
 
-- `shared-references/demand-signal-method.md` —— **需求信号反推法**（money-find 的主方法：信源分级 + 四步推理 + 交叉验证）
-- `shared-references/anti-scam-rubric.md` —— 反诈判定标准 + C′ 时效核查（money-verify / money-find 的唯一标准来源）
-- `shared-references/user-tiers.md` —— **用户段位 T0–T3**（按"资源×技能"分流，机会和收入预期都按段位给）
-- `shared-references/opportunity-taxonomy.md` —— 机会分类框架（辅助分类，不是清单）
-- `examples/worked-examples.md` —— 真实跑出来的高质量范本（给 money-find/money-verify 参照）
-- `templates/money-state.template.json` —— 状态文件模板（schema v2，含 tier + 校准环字段）
+- `shared-references/demand-signal-method.md` —— **需求信号反推法**
+- `shared-references/anti-scam-rubric.md` —— 反诈判定标准 + 时效核查
+- `shared-references/user-tiers.md` —— **用户段位 T0–T3**
+- `shared-references/opportunity-taxonomy.md` —— 机会分类框架
+- `examples/worked-examples.md` —— 真实跑出来的范本
+- `templates/money-state.template.json` —— 状态文件模板
 
-## 数据 adapter（补一手数据短板）
+## 数据 adapter
 
-都是 **B 档半自动**：用户自己登录+搜索（弹滑块手动过），adapter 只读当前页公开列表。绕开"通用网页检索进不去登录墙"的限制。
+- `adapters/xianyu/` —— 闲鱼成交侧
+- `adapters/boss/` —— BOSS直聘招聘侧
 
-- `adapters/xianyu/` —— 闲鱼**成交侧**：一手"在卖什么/什么价/多少人想要"（"有人真付钱"的证据）。
-- `adapters/boss/` —— BOSS直聘**招聘侧**：一手"在招什么/给多少/要哪些 AI 技能"（最诚实的需求温度计）。**只读搜索结果列表页**——列表卡片只有公开的岗位+薪资+公司，HR 个人信息在详情页/聊天里，adapter 一律不碰，故不触反诈红线 A6。两个 adapter 共享同一个 Chrome profile。
+## 校准环
 
-## 校准环（让它越用越准）
-
-`money-plan` 写下「预期」（投入/见钱时间/收入）→ 执行 → `money-retro` 拿「实际」对账 → 经验回流到工作目录的 `lessons.md` → `money-find`/`money-verify` 下次开工先读它。预测→复盘→沉淀，闭环。
+`money-plan` 写预期 → 执行 → `money-retro` 对账 → 经验回流 `lessons.md` → `money-find`/`money-verify` 下次自动读取。
 
 ## 安装
 
 ### Claude Code
-
-把各子 skill 软链到 `~/.claude/skills/`（与 cheat 系列一致）：
 
 ```bash
 cd "$(dirname "$0")" 2>/dev/null
@@ -59,33 +81,8 @@ done
 
 ### Codex
 
-把各子 skill 安装到 `~/.codex/skills/`，同时给每个 skill 补上 Codex 友好的本地资源入口：
-
 ```bash
 ./install-codex.sh
-```
-
-安装后每个 Codex skill 目录会包含：
-
-- `SKILL.md` → 对应子 skill
-- `references/` → `shared-references/`
-- `templates/` → 状态文件模板
-- `examples/` → worked examples
-- `adapters/` → 闲鱼 / BOSS 半自动 adapter
-
-这样不会改动 Claude Code 的 `~/.claude/skills/` 安装方式；两套安装可以同时存在。Codex 读取 skill 列表通常需要重启应用或开启新会话。
-
-> 说明：`SKILL.md` 里的 `allowed-tools` 是 Claude Code 权限声明。Codex 只依赖 `name` / `description` 触发 skill，会忽略这类 Claude 专属字段。
-
-## 典型流程
-
-```
-"我想搞钱" → money-init（建画像）
-"帮我找机会" → money-find（实时检索+反诈）
-"XX 靠谱吗" → money-verify（验证）
-"我做 XX，给我计划" → money-plan（行动方案+验证第一步）
-执行一段时间 → money-retro（复盘）
-随时 → money-status（看板）
 ```
 
 ## 重要声明
