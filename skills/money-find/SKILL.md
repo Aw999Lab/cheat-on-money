@@ -7,6 +7,11 @@ allowed-tools: Bash(*), Read, Write, Edit, Glob, WebSearch, WebFetch, Skill
 
 # /money-find — 需求信号反推 + 反诈筛选
 
+## 跨平台说明（一次性，下文不再重复）
+
+- **资源路径**：下文写的 `../../shared-references/`、`../../templates/`、`../../examples/`、`../../adapters/` 是 repo / Claude Code 的路径；**Codex 安装下改读当前 skill 目录的 `references/`、`templates/`、`examples/`、`adapters/`**（`install-codex.sh` 已软链进来）。
+- **网页检索/打开网页**：Claude Code 用 WebSearch / WebFetch；Codex 用其内置等价能力。`allowed-tools` 是 Claude Code 权限声明，Codex 忽略。
+
 ## 核心方法（先读这条）
 
 **主方法是「需求信号反推法」，不是「搜怎么赚钱的帖子」。**
@@ -18,7 +23,7 @@ allowed-tools: Bash(*), Read, Write, Edit, Glob, WebSearch, WebFetch, Skill
 
 1. **主信源是一级信号**（报告/招聘/采购/政策），**"教你赚钱"类帖子不作依据**，只用来了解方向。
 2. **每个机会要给"推理链 + 交叉验证"**：从哪个信号推出来、另一个独立信号怎么印证它。单一来源 = 未验证。
-3. **绝不凭记忆。** 信号一律 WebSearch 实时获取。
+3. **绝不凭记忆。** 信号一律实时网页检索获取。
 4. **核查发布日期（rubric C′）。** 超 24 个月默认失效；12–24 个月标"可能过时"并交叉验证。检索词加年份。
 5. **每个机会先答"钱从哪来"**，且过三连：谁有真需求 / 个人能否供给 / 买家个人够不够得着。
 6. **每个机会必须过 `../../shared-references/anti-scam-rubric.md`**（含 C′），标注判定后才呈现。
@@ -38,13 +43,13 @@ allowed-tools: Bash(*), Read, Write, Edit, Glob, WebSearch, WebFetch, Skill
 ### Step 1 — 采集需求信号（demand-signal-method Step 1）
 **先按段位锁定方向范围**（user-tiers）：T0→平台众包/接单；T1→技能服务/B端陪跑；T2→小工具/GEO/SaaS；T3→垂直专业服务。**别给低段位推够不着的。**
 
-按方向 WebSearch **一级信源**（都加年份）。除报告外，优先抓更一手的：
+按方向实时网页检索 **一级信源**（都加年份）。除报告外，优先抓更一手的：
 - **真实招聘需求**（BOSS/猎聘"在招什么、给多少、要哪些 AI 技能"——最诚实的需求温度计：岗位涨=有人花钱买这能力，降=红海）
 - **成交侧**（闲鱼/1688/淘宝"正在卖什么服务、销量多少"——"有人真付钱"的直接证据）
-  - ⚠️ **能力边界(诚实标注)**：WebSearch 是境外节点、进不去登录墙，**直接搜只能拿到二手转述**，不是平台实时数据。
+  - ⚠️ **能力边界(诚实标注)**：网页检索通常进不去登录墙，**直接搜只能拿到二手转述**，不是平台实时数据。
   - ✅ **要一手数据用 adapter**（B 档半自动：用户自己登录+搜索，adapter 只读当前页公开列表；弹滑块用户手动过）：
-    - 成交侧 → `adapters/xianyu`（在卖什么/什么价/多少人想要）
-    - 招聘侧 → `adapters/boss`（在招什么/给多少/要哪些 AI 技能；**只读搜索结果列表页**，不进详情页、不碰 HR 个人信息，故不触反诈 A6）
+    - 成交侧 → `../../adapters/xianyu`（在卖什么/什么价/多少人想要）
+    - 招聘侧 → `../../adapters/boss`（在招什么/给多少/要哪些 AI 技能；**只读搜索结果列表页**，不进详情页、不碰 HR 个人信息，故不触反诈 A6）
 - `<行业> AI 落地 需求 / 缺口 / 痛点 报告`
 - `<工具/服务> 市场规模 增长 采购 B端`
 - `平台 官方 创作者 扶持 / 变现 政策` · `政策 / 监管 <领域> 新规`

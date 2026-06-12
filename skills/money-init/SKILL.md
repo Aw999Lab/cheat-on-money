@@ -9,6 +9,10 @@ allowed-tools: Bash(*), Read, Write, Edit, Glob, Skill
 
 把用户从"我想搞钱"带到"有了一份清晰画像、可以开始找机会"，全程 ≤ 5 分钟。
 
+## 跨平台说明（一次性，下文不再重复）
+
+下文写的 `../../shared-references/`、`../../templates/` 是 repo / Claude Code 的路径；**Codex 安装下改读当前 skill 目录的 `references/`、`templates/`**（`install-codex.sh` 已软链进来）。`allowed-tools` 是 Claude Code 权限声明，Codex 忽略。
+
 ## 设计哲学（必须先认同）
 
 这套工具的差异点不是"列兼职"，是**反诈 + 个性化 + 实时验证**。所以 init 的目标不是给机会，

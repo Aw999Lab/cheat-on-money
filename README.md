@@ -31,7 +31,7 @@
 
 ## 数据 adapter（补一手数据短板）
 
-都是 **B 档半自动**：用户自己登录+搜索（弹滑块手动过），adapter 只读当前页公开列表。绕开"WebSearch 境外节点进不去登录墙"的限制。
+都是 **B 档半自动**：用户自己登录+搜索（弹滑块手动过），adapter 只读当前页公开列表。绕开"通用网页检索进不去登录墙"的限制。
 
 - `adapters/xianyu/` —— 闲鱼**成交侧**：一手"在卖什么/什么价/多少人想要"（"有人真付钱"的证据）。
 - `adapters/boss/` —— BOSS直聘**招聘侧**：一手"在招什么/给多少/要哪些 AI 技能"（最诚实的需求温度计）。**只读搜索结果列表页**——列表卡片只有公开的岗位+薪资+公司，HR 个人信息在详情页/聊天里，adapter 一律不碰，故不触反诈红线 A6。两个 adapter 共享同一个 Chrome profile。
@@ -41,6 +41,8 @@
 `money-plan` 写下「预期」（投入/见钱时间/收入）→ 执行 → `money-retro` 拿「实际」对账 → 经验回流到工作目录的 `lessons.md` → `money-find`/`money-verify` 下次开工先读它。预测→复盘→沉淀，闭环。
 
 ## 安装
+
+### Claude Code
 
 把各子 skill 软链到 `~/.claude/skills/`（与 cheat 系列一致）：
 
@@ -54,6 +56,26 @@ done
 ```
 
 或直接运行 `./install.sh`。
+
+### Codex
+
+把各子 skill 安装到 `~/.codex/skills/`，同时给每个 skill 补上 Codex 友好的本地资源入口：
+
+```bash
+./install-codex.sh
+```
+
+安装后每个 Codex skill 目录会包含：
+
+- `SKILL.md` → 对应子 skill
+- `references/` → `shared-references/`
+- `templates/` → 状态文件模板
+- `examples/` → worked examples
+- `adapters/` → 闲鱼 / BOSS 半自动 adapter
+
+这样不会改动 Claude Code 的 `~/.claude/skills/` 安装方式；两套安装可以同时存在。Codex 读取 skill 列表通常需要重启应用或开启新会话。
+
+> 说明：`SKILL.md` 里的 `allowed-tools` 是 Claude Code 权限声明。Codex 只依赖 `name` / `description` 触发 skill，会忽略这类 Claude 专属字段。
 
 ## 典型流程
 

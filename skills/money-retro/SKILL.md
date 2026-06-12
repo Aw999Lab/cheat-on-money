@@ -9,6 +9,10 @@ allowed-tools: Bash(*), Read, Write, Edit, Glob, Skill
 
 不复盘的尝试等于碰运气。这一步把"实际发生的"和"当初预期的"对齐，让推荐越来越准。
 
+## 跨平台说明
+
+`allowed-tools` 是 Claude Code 权限声明；Codex 可忽略，并使用当前会话可用的本地文件工具完成同等动作。
+
 ## 流程
 
 ### Step 1 — 取出原始预期

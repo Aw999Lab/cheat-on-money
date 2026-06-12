@@ -9,6 +9,10 @@ allowed-tools: Bash(*), Read, Glob, Skill
 
 只读，不改任何东西。汇总当前进展并给出下一步建议。
 
+## 跨平台说明
+
+`allowed-tools` 是 Claude Code 权限声明；Codex 可忽略，并使用当前会话可用的本地文件工具完成同等动作。
+
 ## 流程
 
 ### Step 1 — 读状态
